@@ -1,0 +1,83 @@
+{
+  "name": "@foxsecura/anti-raid",
+  "version": "0.2.0",
+  "description": "Composable anti-raid protection modules for Discord bots, with a framework-agnostic core and a discord.js adapter.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    },
+    "./modules": {
+      "types": "./dist/modules/index.d.ts",
+      "import": "./dist/modules/index.js"
+    },
+    "./presets": {
+      "types": "./dist/presets/index.d.ts",
+      "import": "./dist/presets/index.js"
+    },
+    "./adapters/discord.js": {
+      "types": "./dist/adapters/discordjs/index.d.ts",
+      "import": "./dist/adapters/discordjs/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "check": "biome check . && tsc --noEmit",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepare": "npm run build"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "peerDependencies": {
+    "discord.js": ">=14.0.0 <15.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.3",
+    "discord.js": "^14.26.5",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  },
+  "keywords": [
+    "discord",
+    "discord-bot",
+    "anti-raid",
+    "security",
+    "typescript",
+    "discordjs",
+    "modular",
+    "plugin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GhostPunishR/Anti-Raid.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GhostPunishR/Anti-Raid/issues"
+  },
+  "homepage": "https://github.com/GhostPunishR/Anti-Raid#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "license": "MIT",
+  "overrides": {
+    "undici": "6.27.0"
+  }
+}
