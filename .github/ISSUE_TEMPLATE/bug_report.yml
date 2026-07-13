@@ -1,0 +1,53 @@
+name: Bug report
+description: Report a reproducible problem in FoxSecura Anti-Raid
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Do not disclose security vulnerabilities here; use private vulnerability reporting instead.
+  - type: checkboxes
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and pull requests.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true
+        - label: I removed tokens, IDs, and private server data from the report.
+          required: true
+  - type: input
+    attributes:
+      label: Package or commit version
+      placeholder: "0.1.0 or commit SHA"
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Runtime versions
+      description: Include Node.js and discord.js versions.
+      placeholder: "Node.js 22.x, discord.js 14.x"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction
+      description: Provide a minimal, safe reproduction or repository.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Logs or additional context
+      description: Redact tokens, IDs, and personal data.
+      render: shell

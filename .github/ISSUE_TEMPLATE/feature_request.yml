@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest an improvement to the anti-raid set
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and pull requests.
+          required: true
+        - label: The proposal fits a reusable Discord anti-raid module.
+          required: true
+  - type: textarea
+    attributes:
+      label: Problem
+      description: What security, integration, or developer problem should be solved?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Security and moderation considerations
+      description: Explain permissions, false positives, abuse cases, and safe defaults.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Alternatives considered
