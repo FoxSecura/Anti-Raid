@@ -1,7 +1,7 @@
 import type { Client } from "discord.js";
 import { describe, expect, it, vi } from "vitest";
-import type { RaidIncident } from "../src/core/types.js";
 import { enforceAntiRaidIncident } from "../src/adapters/discordjs/enforcement.js";
+import type { RaidIncident } from "../src/core/types.js";
 
 const incident: RaidIncident = {
   id: "incident-1",
