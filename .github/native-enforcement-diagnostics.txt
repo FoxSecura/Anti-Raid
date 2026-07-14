@@ -2,4 +2,4 @@
 > @foxsecura/anti-raid@0.2.0 check
 > biome check . && tsc --noEmit
 
-Checked 34 files in 22ms. No fixes applied.
+Checked 34 files in 16ms. No fixes applied.
