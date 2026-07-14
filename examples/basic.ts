@@ -21,14 +21,22 @@ const antiRaid = new DiscordJsAntiRaid(client, {
     createBotJoinWaveModule(),
     createRejoinLoopModule({ joinsPerMember: 3 }),
   ],
-  onIncident: async ({ incident, member }) => {
-    console.warn(`[${incident.severity}] ${incident.moduleId}`, incident);
-
-    // Integrate your own project services here:
-    // await securityLogger.write(incident);
-    // await quarantineService.apply(member.guild, incident.memberIds);
-    // await lockdownService.enable(member.guild.id);
-    void member;
+  enforcement: {
+    enabled: true,
+    timeout: {
+      enabled: true,
+      durationMs: 30 * 60 * 1000,
+      minimumSeverity: "high",
+    },
+    kick: {
+      enabled: false,
+    },
+    ban: {
+      enabled: false,
+    },
+  },
+  onIncident: ({ incident, enforcementResults }) => {
+    console.warn(`[${incident.severity}] ${incident.moduleId}`, enforcementResults);
   },
 });
 

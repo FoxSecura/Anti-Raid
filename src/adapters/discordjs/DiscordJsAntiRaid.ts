@@ -2,6 +2,7 @@ import { type Client, Events, type GuildMember } from "discord.js";
 import { AntiRaidEngine } from "../../core/AntiRaidEngine.js";
 import type { RaidIncident } from "../../core/types.js";
 import { createDefaultAntiRaidModules } from "../../presets/default.js";
+import { enforceAntiRaidIncident } from "./enforcement.js";
 import { toMemberJoinEvent } from "./toMemberJoinEvent.js";
 import type { DiscordJsAntiRaidOptions } from "./types.js";
 
@@ -9,12 +10,14 @@ export class DiscordJsAntiRaid {
   readonly #client: Client;
   readonly #engine: AntiRaidEngine;
   readonly #onIncident: DiscordJsAntiRaidOptions["onIncident"];
+  readonly #enforcement: DiscordJsAntiRaidOptions["enforcement"];
   readonly #memberJoinHandler: (member: GuildMember) => void;
   #started = false;
 
   constructor(client: Client, options: DiscordJsAntiRaidOptions = {}) {
     this.#client = client;
     this.#onIncident = options.onIncident;
+    this.#enforcement = options.enforcement;
     this.#engine = new AntiRaidEngine({
       modules: options.modules ?? createDefaultAntiRaidModules(options.preset),
       enabled: options.enabled,
@@ -52,7 +55,19 @@ export class DiscordJsAntiRaid {
     const incidents = await this.#engine.handleMemberJoin(event);
 
     for (const incident of incidents) {
-      await this.#onIncident?.({ incident, event, member, client: this.#client });
+      const enforcementResults = await enforceAntiRaidIncident(
+        this.#client,
+        incident,
+        this.#enforcement,
+        member,
+      );
+      await this.#onIncident?.({
+        incident,
+        event,
+        member,
+        client: this.#client,
+        enforcementResults,
+      });
     }
 
     return incidents;
