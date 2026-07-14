@@ -107,7 +107,8 @@ export async function enforceAntiRaidIncident(
   }
 
   const results: DiscordJsAntiRaidEnforcementResult[] = [];
-  const guild = client.guilds.cache.get(incident.guildId) ?? (await client.guilds.fetch(incident.guildId));
+  const guild =
+    client.guilds.cache.get(incident.guildId) ?? (await client.guilds.fetch(incident.guildId));
   const reason = reasonFor(incident, options);
 
   for (const action of actions) {
@@ -167,8 +168,8 @@ export async function enforceAntiRaidIncident(
         const member =
           knownMember?.id === memberId
             ? knownMember
-            : guild.members.cache.get(memberId) ??
-              (await guild.members.fetch(memberId).catch(() => null));
+            : (guild.members.cache.get(memberId) ??
+              (await guild.members.fetch(memberId).catch(() => null)));
         if (!member || isProtectedMember(client, member, options)) continue;
 
         if (action === "add-quarantine-role") {

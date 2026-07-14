@@ -61,10 +61,7 @@ export interface DiscordJsAntiRaidEnforcementOptions {
     | ((result: DiscordJsAntiRaidEnforcementResult) => void | Promise<void>)
     | undefined;
   readonly onError?:
-    | ((
-        error: unknown,
-        context: DiscordJsAntiRaidEnforcementErrorContext,
-      ) => void | Promise<void>)
+    | ((error: unknown, context: DiscordJsAntiRaidEnforcementErrorContext) => void | Promise<void>)
     | undefined;
 }
 
