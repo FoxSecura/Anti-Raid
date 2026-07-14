@@ -15,7 +15,7 @@
 
 `@foxsecura/anti-raid` is the **raid-protection category** of the FoxSecura Security Modules suite. It is an installable TypeScript package for existing Discord bots, not a standalone bot.
 
-It detects coordinated or abnormal member joins and returns structured incidents. The consuming bot remains responsible for quarantine, lockdowns, logging, persistence, permissions, and deployment.
+It detects coordinated or abnormal member joins and can quarantine suspicious members through first-party Discord.js enforcement. Enforcement remains opt-in, while the core stays detection-only.
 
 ## FoxSecura security suite
 
@@ -55,8 +55,9 @@ Every module can be enabled, disabled, configured, replaced, or combined with pr
 - explicit `start()` and `stop()` lifecycle;
 - structured, serializable incidents;
 - project-level ignore lists;
-- no required database, command framework, logger, or environment loader;
-- no automatic sanctions.
+- no required database, command framework, logger, environment loader, or external quarantine service;
+- optional first-party Discord.js enforcement;
+- sanctions disabled until `enforcement.enabled` is explicitly set.
 
 ## Architecture
 
@@ -66,7 +67,7 @@ src/
 ├── modules/              # Independent modules for this security category
 ├── presets/              # Ready-to-use module collections
 ├── adapters/
-│   └── discordjs/        # Discord.js v14 integration
+│   └── discordjs/        # Discord.js v14 integration and enforcement
 └── index.ts              # Public package exports
 ```
 
@@ -84,7 +85,7 @@ npm install github:FoxSecura/Anti-Raid
 
 ## Quick start
 
-Enable the **Server Members Intent** in the Discord Developer Portal and in the client.
+Enable the **Server Members Intent**. Grant **Moderate Members** for timeout-based quarantine, or **Manage Roles** when using a quarantine role.
 
 ```ts
 import { Client, GatewayIntentBits } from "discord.js";
@@ -102,8 +103,26 @@ const client = new Client({
 
 const antiRaid = new DiscordJsAntiRaid(client, {
   modules: createDefaultAntiRaidModules(),
-  onIncident: async (incident) => {
-    await securityBus.publish(incident);
+  enforcement: {
+    enabled: true,
+    quarantineRoleId: process.env.QUARANTINE_ROLE_ID,
+    timeout: {
+      enabled: true,
+      durationMs: 30 * 60 * 1000,
+      minimumSeverity: "high",
+    },
+    kick: {
+      enabled: false,
+    },
+    ban: {
+      enabled: false,
+    },
+    onAction: (result) => {
+      console.info("[FoxSecura Anti-Raid]", result);
+    },
+  },
+  onIncident: ({ incident, enforcementResults }) => {
+    console.warn(incident.description, enforcementResults);
   },
 });
 
@@ -113,6 +132,17 @@ await client.login(process.env.DISCORD_TOKEN);
 
 Call `antiRaid.stop()` during shutdown, hot reload, or plugin unload.
 
+## Native enforcement
+
+When `enforcement.enabled` is `true`, the Discord.js adapter can:
+
+- add a configured quarantine role to suspicious members;
+- fall back to a timeout when no quarantine role is configured;
+- optionally kick or ban critical incidents;
+- send an alert to a configured moderation channel.
+
+Kick and ban remain disabled unless explicitly enabled. The adapter protects the guild owner, the bot itself, ignored roles, and members that Discord's role hierarchy prevents the bot from managing. Use `dryRun: true` before enabling sanctions.
+
 ## Framework-independent usage
 
 ```ts
@@ -121,7 +151,7 @@ import { createDefaultAntiRaidModules } from "@foxsecura/anti-raid/presets";
 
 const engine = new AntiRaidEngine({
   modules: createDefaultAntiRaidModules(),
-  onIncident: (incident) => securityBus.publish(incident),
+  onIncident: (incident) => console.warn(incident),
 });
 
 await engine.handleMemberJoin(normalizedMemberJoinEvent);
@@ -141,20 +171,20 @@ Projects using another Discord library only need to map their member events to t
 
 ## Consuming bot responsibilities
 
-The consuming bot decides how to:
+The consuming bot still decides how to:
 
-- quarantine or review suspicious members;
-- trigger a temporary lockdown;
-- store incidents and guild configuration;
-- exempt trusted members, roles, or guilds;
+- configure thresholds, quarantine roles, timeout duration, and alert channels;
+- explicitly enable or disable kick and ban escalation;
+- store incidents and per-guild configuration;
 - coordinate Anti-Raid with Anti-Spam, Anti-Nuke, and Automod;
-- apply permissions, approval rules, and operational safeguards.
+- grant the Discord permissions required by the enabled actions;
+- maintain allowlists, operational logs, and recovery procedures.
 
 ## Safety model
 
-Anti-Raid only detects and reports. It does not automatically ban members, alter roles, delete channels, or lock a guild.
+The framework-independent core never mutates Discord. The Discord.js adapter sanctions only when `enforcement.enabled` is explicitly enabled.
 
-Recommended actions are advisory. The consuming bot must validate context and apply its own hierarchy, allowlists, cooldowns, and audit logging.
+Timeout quarantine is the safe default. Kick and ban require separate opt-in flags and severity thresholds. The adapter checks ownership, ignored roles, manageability, moderatability, kickability, and bannability before every response.
 
 ## Development
 
